@@ -70,9 +70,20 @@
                             var ipDetails = `<p>IP Address: ${ipAddress}</p>`;
                             ipDetails += `<p>City: ${ipData.city}</p>`;
                             ipDetails += `<p>Country: ${ipData.country}</p>`;
-                            ipDetails += `<p>Is Blacklisted: Not checked</p>`;
-                            ipDetailsDiv.innerHTML = ipDetails;
-                            openModal();
+                            
+                            // Get IP reputation from ipqualityscore.com
+                            fetch("https://ipqualityscore.com/api/json/ip/TpBRQ3MgSf8BbKhUXlNbbN9QoY2MSeY8/" + ipAddress)
+                                .then(response => response.json())
+                                .then(data => {
+                                    ipDetails += `<p>Is Blacklisted: ${data.fraud_score > 0 ? 'Yes' : 'No'}</p>`;
+                                    ipDetailsDiv.innerHTML = ipDetails;
+                                    openModal();
+                                })
+                                .catch(error => {
+                                    console.error("Error fetching IP reputation:", error);
+                                    ipDetailsDiv.innerHTML = "<p>Error fetching IP reputation</p>";
+                                    openModal();
+                                });
                         })
                         .catch(error => {
                             console.error("Error fetching IP details:", error);
